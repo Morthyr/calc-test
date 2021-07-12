@@ -1,0 +1,25 @@
+{
+  "name": "example-typescript",
+  "version": "1.0.0",
+  "description": "a typescript example",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "tsc": "tsc",
+    "run": "webdriver-manager update && webdriver-manager start",
+    "pretest": "webdriver-manager update && npm run tsc",
+    "test": "protractor tmp/conf.js",
+    "debug": "node --inspect-brk ./node_modules/.bin/protractor conf.ts"
+  },
+  "dependencies": {
+    "@types/jasmine": "^3.8.1",
+    "@types/jasminewd2": "^2.0.10",
+    "jasmine": "^3.8.0",
+    "protractor": "^7.0.0",
+    "typescript": "4.3.5"
+  },
+  "devDependencies": {
+    "@types/jasminewd2": "^2.0.10",
+    "ts-node": "^10.1.0"
+  }
+}
