@@ -1,5 +1,6 @@
 // local import of the exported AngularPage class
 import {CalculatorHomepage} from './calculatorHomepage';
+import { StepWidget } from './stepWidget';
 
 // The jasmine typings are brought in via DefinitelyTyped ambient typings.
 describe('homepage', () => {
@@ -10,16 +11,34 @@ describe('homepage', () => {
     await calculatorHomepage.get();
   });
 
-  it('has cookie consent', async () => {
-    expect(await calculatorHomepage.checkCookieConsentVisibility(true)).toBeTruthy();
+  describe('cookie consent', () => {
+    const consent = calculatorHomepage.cookieConsent;
+    
+    it('visible', async () => {
+      expect(await consent.checkVisibility(true)).toBeTruthy();
+    })
+  
+    it('accept', async () => {
+      await consent.accept();
+      expect(await consent.checkVisibility(false)).toBeTruthy();
+    });
+  })
+  
+  let steps: StepWidget[]
+  it('has steps', async () => {
+    steps = await (await calculatorHomepage.form).steps
+    expect(steps.length).toBeGreaterThan(0)
+    
   })
 
-  it('accept cookie consent', async () => {
-    await calculatorHomepage.acceptCookies();
-    expect(await calculatorHomepage.checkCookieConsentVisibility(false)).toBeTruthy();
-  });
+  const firstStep = steps[0]
+  it('has first step', async () => {
+    expect(await firstStep.getQuestion()).toEqual('Van házastársa vagy élettársa?');
+  })
 
-  it('has question', async () => {
-    expect(await calculatorHomepage.getQuestion()).toEqual('Van házastársa vagy élettársa?');
+  const option = 'Igen, van'
+  it(`select "${option}"`, async () => {
+    await firstStep.selectAnswer(option)
+    expect(firstStep.checkAnswerSelection(option, true)).toBeTruthy();
   })
 });
