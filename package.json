@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "run": "webdriver-manager update && webdriver-manager start",
     "pretest": "webdriver-manager update && npm run tsc",
-    "test": "protractor tmp/conf.js",
+    "test": "protractor tmp/conf.js > test.log",
     "debug": "node --inspect-brk ./node_modules/.bin/protractor conf.ts"
   },
   "dependencies": {
