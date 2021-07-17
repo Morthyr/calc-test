@@ -4,15 +4,25 @@
 // import {browser, element, by, By, $, $$, ExpectedConditions}
 //   from 'protractor/globals';
 //
-import {browser, element, by, $$ } from 'protractor';
+import {browser, element, by, $$, until } from 'protractor';
 import { CookieConsentWidget } from './cookieConsentWidget';
 import { FormPage } from './formPage';
 
 export class CalculatorHomepage {
-  form = browser.driver.findElement(by.className('form')).then(form => new FormPage(form))
-  cookieConsent = new CookieConsentWidget()
-
+  private form = by.className('form')
+  private cookie = by.id('cookie-consent-grant')
+  
   async get() {
     await browser.driver.get('https://scportal.granitbank.hu/jelzalog/kalkulator');
+  }
+
+  async getCookieConsent() {
+    const cookieConsent = await browser.driver.wait(until.elementLocated(this.cookie))
+    return new CookieConsentWidget(cookieConsent);
+  }
+
+  async getForm() {
+    const form = await browser.driver.wait(until.elementLocated(this.form))
+    return new FormPage(form);
   }
 }

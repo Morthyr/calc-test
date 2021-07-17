@@ -20,6 +20,9 @@
   },
   "devDependencies": {
     "@types/jasminewd2": "^2.0.10",
+    "@types/node": "^16.3.1",
+    "protractor-html-screenshot-reporter": "0.0.21",
+    "protractor-jasmine2-screenshot-reporter": "^0.5.0",
     "ts-node": "^10.1.0"
   }
 }

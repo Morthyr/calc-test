@@ -1,37 +1,41 @@
-import { browser, by } from "protractor";
+import { browser, by, ExpectedConditions, until } from "protractor";
 import { WebElement } from "selenium-webdriver";
+import { AnswerWidget } from "./answerWidget";
+import { InputAnswerWidget } from "./inputAnswerWidget";
 
 export class StepWidget {
     constructor(private step: WebElement) {}
 
     question = this.step.findElement(by.className('question')) 
-    answers = this.step.findElements(by.className('answer'))
+    private answers = this.step.findElements(by.className('answer'))
 
     async getQuestion() {
         return await this.question.getText();
     }
 
-    async getAnswers() {
-        let answers = await this.answers;
-        return answers.map(async (answer) => await answer.getText())
-    }
+    async getAnswer(optionText: string) {
+        const answer = await browser.driver.wait(async () => {
+            const answerEls = await this.answers;
+            if(!answerEls || answerEls.length === 0) {
+                console.log("There is no answer")
+                return false;
+            }
 
-    async selectAnswer(optionText: string) {
-        const option = (await this.answers).find(async (answer) => 
-            (await answer.getText()) == optionText);
-    
-        await option.click();
+            const answerEl = answerEls.find(async (answer) => (await answer.getText()).match(optionText));
+            if(!answerEl) {
+                console.log(`There is no matching answer to ${optionText}`)
+                return false;
+            }
 
-        return option;
-    }
-
-    async checkAnswerSelection(optionText: string, expectation: boolean) {
-        const expectationMet = await browser.driver.wait(async() => {
-            const option = (await this.answers).find(async (answer) => 
-            (await answer.getText()) == optionText);
-        return ((await option.getAttribute("class")).split(' ').indexOf("selected") > -1 ) == expectation
+            return this.answerFactory(answerEl)
         })
+        return answer ? answer : null
+    }
 
-    return expectationMet
+    private async answerFactory(answer: WebElement) {
+        const hasInput = (await answer.findElements(by.className("text-input"))).length > 0
+        if(hasInput)
+            return new InputAnswerWidget(answer);
+        return new AnswerWidget(answer);
     }
 }

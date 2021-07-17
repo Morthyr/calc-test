@@ -1,14 +1,12 @@
-import { browser, by } from "protractor";
+import { browser, by, until, WebElement } from "protractor";
 
 export class CookieConsentWidget {
-  cookieConsentGrant = browser.driver.findElement(by.id('cookie-consent-grant'));
+  constructor(private cookieConsentGrant: WebElement) {}
 
   async checkVisibility(expectation: boolean) {
-    const expectationMet = await browser.driver.wait(async () => { 
-      const displayed = await this.cookieConsentGrant.isDisplayed()
-      return displayed == expectation;
-    })
-    return expectationMet
+    const visFn = expectation ? until.elementIsVisible : until.elementIsNotVisible; 
+    const cookieConsentGrant = await browser.driver.wait(visFn(this.cookieConsentGrant))
+    return !!cookieConsentGrant
   }
 
   async accept() {
