@@ -1,6 +1,7 @@
 // local import of the exported AngularPage class
+import { browser } from 'protractor';
 import { AnswerWidget } from './answerWidget';
-import {CalculatorHomepage} from './calculatorHomepage';
+import { CalculatorHomepage } from './calculatorHomepage';
 import { CookieConsentWidget } from './cookieConsentWidget';
 import { FormPage } from './formPage';
 import { InputAnswerWidget } from './inputAnswerWidget';
@@ -17,7 +18,7 @@ describe('homepage', () => {
 
 describe('cookie consent', () => {
   let consent: CookieConsentWidget;
-  
+
   it('visible', async () => {
     consent = await calculatorHomepage.getCookieConsent()
     expect(await consent.checkVisibility(true)).toBeTruthy();
@@ -32,23 +33,27 @@ describe('cookie consent', () => {
 interface TestData {
   question: string;
   option: string;
-  optionValue?: string | number;
+  optionValues?: (string | number)[];
 }
 
 const testData: TestData[] = [{
   question: 'Van házastársa vagy élettársa?',
   option: 'Igen, van'
 }, {
-  question: 'Van 14 éven aluli gyerme(kük|ke)',
+  question: 'Van 14 éven aluli gyerme(kük|ke)?',
   option: 'Igen, (\\d) gyerme(künk|kem) van',
-  optionValue: 9
+  optionValues: [9]
+}, {
+  question: 'Él Önnel más egy háztartásban \\((házastársán, élettársán és |)14 éven aluli gyermekein kívül\\)?',
+  option: 'Igen, (\\d) felnőtt és (\\d) nyugdíjas él vel(em|ünk)',
+  optionValues: [9, 9]
 }]
 
 testData.forEach((testItem, testIndex) => {
   const testOrder = testIndex + 1;
 
   describe(`fill ${testOrder}. step`, () => {
-    let form: FormPage;    
+    let form: FormPage;
     let steps: StepWidget[]
 
     it(`has ${testOrder} step(s)`, async () => {
@@ -56,13 +61,21 @@ testData.forEach((testItem, testIndex) => {
       expect(await form.checkStepCount(testOrder)).toBeTruthy()
       steps = await form.steps
     })
-  
+
+    if (testIndex > 1) {
+      it("scroll bottom", async () => {
+        expect(await form.checkScrollButtonVisibility(true)).toBeTruthy()
+        await form.scrollButton.click()
+        expect(await form.checkScrollButtonVisibility(false)).toBeTruthy()
+      })
+    }
+
     let currentStep: StepWidget;
     it(`has ${testOrder}. step`, async () => {
       currentStep = steps[testIndex]
       expect(await currentStep.getQuestion()).toMatch(testItem.question);
     })
-  
+
     const option = testItem.option
     let answer: AnswerWidget;
     it(`select "${option}"`, async () => {
@@ -71,13 +84,19 @@ testData.forEach((testItem, testIndex) => {
       await answer.select();
     })
 
-    const optionValue = testItem.optionValue
-    if(optionValue) {
-      it(`set input to "${optionValue}"`, async () => {
-        await (answer as InputAnswerWidget).setInput(optionValue)
-        const text = await answer.getText()
-        expect(text).toMatch(option)
-        expect(text).toMatch(optionValue.toString())
+    const optionValues = testItem.optionValues
+    if (optionValues) {
+      it(`set input(s) to "${optionValues}"`, async (done) => {
+        try {
+          await (answer as InputAnswerWidget).setInput(optionValues)
+          
+          const text = await answer.getText()
+          expect(text).toMatch(option)
+          optionValues.forEach(optionValue => expect(text).toMatch(optionValue.toString()))
+          done()
+        } catch (error) {
+          done.fail(error)
+        }
       })
     }
 
