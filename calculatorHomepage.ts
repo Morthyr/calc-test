@@ -5,8 +5,8 @@
 //   from 'protractor/globals';
 //
 import {browser, element, by, $$, until, WebElement } from 'protractor';
-import { CookieConsentWidget } from './cookieConsentWidget';
-import { FormPage } from './formPage';
+import { CookieConsentWidget } from './widgets/cookieConsentWidget';
+import { FormWidget } from './widgets/formWidget';
 
 export class CalculatorHomepage {
   private formsLocator = by.css('app-form-wizard .form')
@@ -43,7 +43,7 @@ export class CalculatorHomepage {
       }
       return null;
     })
-    const formPage = new FormPage(this, form);
+    const formPage = new FormWidget(this, form);
     return formPage;
   }
 }

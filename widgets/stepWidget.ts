@@ -1,7 +1,7 @@
 import { browser, by, ExpectedConditions, until } from "protractor";
 import { WebElement } from "selenium-webdriver";
-import { AnswerWidget } from "./answerWidget";
-import { InputAnswerWidget } from "./inputAnswerWidget";
+import { AnswerWidget } from "./answer/answerWidget";
+import { InputAnswerWidget } from "./answer/inputAnswerWidget";
 
 export class StepWidget {
     constructor(private step: WebElement) {}

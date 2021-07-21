@@ -1,8 +1,8 @@
 import { browser, by, promise, until, WebElement } from "protractor";
-import { CalculatorHomepage } from "./calculatorHomepage";
+import { CalculatorHomepage } from "../calculatorHomepage";
 import { StepWidget } from "./stepWidget";
 
-export class FormPage {
+export class FormWidget {
     constructor(private home: CalculatorHomepage, private form: WebElement) { }
 
     private scrollButtonLocator = by.className("scroll-button")
