@@ -17,9 +17,9 @@ export let config: Config = {
   /*seleniumAddress: 'http://localhost:4444/wd/hub'*/
   SELENIUM_PROMISE_MANAGER: false,
 
-  allScriptsTimeout: 60_000,
+  allScriptsTimeout: 6_000,
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 60_000
+    defaultTimeoutInterval: 6_000
   },
 
   // Setup the report before any tests start

@@ -6,30 +6,29 @@ import { InputAnswerWidget } from "./inputAnswerWidget";
 export class StepWidget {
     constructor(private step: WebElement) {}
 
-    question = this.step.findElement(by.className('question')) 
-    private answers = this.step.findElements(by.className('answer'))
+    private questionLocator = by.className('question')
+    private answersLocator = by.className('answer')
 
     async getQuestion() {
-        return await this.question.getText();
+        return await (await browser.driver.wait(until.elementIsVisible(this.step.findElement(this.questionLocator)))).getText();
     }
 
     async getAnswer(optionText: string) {
-        const answer = await browser.driver.wait(async () => {
-            const answerEls = await this.answers;
+        return await browser.driver.wait(async () => {
+            const answerEls = await this.step.findElements(this.answersLocator);
             if(!answerEls || answerEls.length === 0) {
                 console.log("There is no answer")
-                return false;
+                return null;
             }
 
             const answerEl = answerEls.find(async (answer) => (await answer.getText()).match(optionText));
             if(!answerEl) {
                 console.log(`There is no matching answer to ${optionText}`)
-                return false;
+                return null;
             }
 
             return this.answerFactory(answerEl)
         })
-        return answer ? answer : null
     }
 
     private async answerFactory(answer: WebElement) {
